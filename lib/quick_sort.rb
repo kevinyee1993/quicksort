@@ -23,34 +23,48 @@ class QuickSort
 
   # In-place.
   def self.sort2!(array, start = 0, length = array.length, &prc)
-    # return array if array.length == 1
-    # pivot = self.partition(array, start, length)
-    #
-    # self.sort2!(array[0...pivot], start, length)
-    # self.sort2!(array[pivot + 1..-1], start, length)
+    prc ||= Proc.new{|x,y| x <=> y}
 
-    # array.sort!
+    return array if length < 2
+    pivot = partition(array, start, length, &prc)
+    left_length = pivot - start
+    right_length = length - (left_length + 1)
 
+    sort2!(array, start, left_length, &prc)
+    sort2!(array, pivot + 1, right_length, &prc)
+
+    return array
   end
 
   def self.partition(array, start, length, &prc)
+
+    prc ||= Proc.new{|x,y| x <=> y}
     pivot = array[start]
-    partition = start + 1
+    pivot_idx = start
 
     for i in start + 1...start + length
-      if array[i] <= pivot
-        temp = array[i]
-        array[i] = array[partition]
-        array[partition] = array[i]
-        partition += 1
+
+      # if array[i] <= pivot && !found_big
+      if prc.call(pivot, array[i]) > 0
+        array[i], array[pivot_idx+1] = array[pivot_idx+1], array[i]
+        pivot_idx += 1
+      # elsif array[i] <= pivot && found_big
+      #   temp = array[i]
+      #   array[i] = array[pivot_idx]
+      #   array[pivot_idx] = temp
+      #
+      #   pivot_idx += 1
+      #   found_big = false
+      # elsif array[i] > pivot
+      #   found_big = true
+      p array
       end
     end
 
-    temp = pivot
-    pivot = array[partition - 1]
-    array[partition - 1] = temp
+#need to get pivotIDX
+    array[start], array[pivot_idx] = array[pivot_idx], array[start]
 
-    return partition-1
+    return pivot_idx
 
   end
 
